@@ -265,7 +265,6 @@ function cekSandi(){
     sessionStorage.setItem('es_login','1');
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app-main').classList.remove('app-hidden');
-    initApp();
   } else {
     err.textContent='⚠️ Sandi salah, coba lagi';
     inp.value='';
@@ -282,7 +281,7 @@ function logout(){
   sessionStorage.removeItem('es_login');
   location.reload();
 }
-function initApp(){
+
 let orders=JSON.parse(localStorage.getItem('es_orders')||'[]');
 orders=orders.map(o=>{if(o.items)return o;return {...o,wilayah:o.wilayah||'',alamat:o.alamat||'',items:[{produkId:o.produkId,jenis:o.jenis||'Manual',jumlah:o.jumlah||1,harga:o.harga||0,subtotal:(o.jumlah||1)*(o.harga||0)}]}});
 let keuangan=JSON.parse(localStorage.getItem('es_keuangan')||'[]');
@@ -324,11 +323,6 @@ function renderRekap(){const tP=keuangan.filter(k=>k.jenis==='pemasukan').reduce
 function exportData(){const data={orders,keuangan,produk,exported:new Date().toISOString(),version:2};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`backup-eskristal-${today()}.json`;a.click();URL.revokeObjectURL(url);toast('✓ Backup berhasil diunduh')}
 function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(!confirm('Restore akan mengganti SEMUA data saat ini. Lanjut?'))return;orders=(d.orders||[]).map(o=>{if(o.items)return o;return {...o,wilayah:o.wilayah||'',alamat:o.alamat||'',items:[{produkId:o.produkId,jenis:o.jenis||'Manual',jumlah:o.jumlah||1,harga:o.harga||0,subtotal:(o.jumlah||1)*(o.harga||0)}]}});keuangan=d.keuangan||[];produk=d.produk||produk;save();renderDashboard();toast('✓ Restore berhasil')}catch(err){toast('⚠️ File tidak valid')}};r.readAsText(f);e.target.value=''}
 save();renderDashboard();
-}
-// jalanin app kalau udah login
-if(sessionStorage.getItem('es_login')==='1'){
-  initApp();
-}
 </script>
 </body>
 </html>
